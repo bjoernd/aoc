@@ -13,5 +13,6 @@ Cargo.lock
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
-# Don't upload our session key
+# Don't upload our session key and inputs
 .session
+.input

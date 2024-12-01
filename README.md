@@ -43,7 +43,7 @@ so that you can download inputs automatically.
 
 ### Logging In to Advent of Code
 
-Go to the [Advent of Code][aoc 2023] site and log in at the top of the
+Go to the [Advent of Code][aoc] site and log in at the top of the
 page. Once you're signed in, you should open the Developer Tools and head
 to the "Network" tab, and then reload the page. Look through your requests
 until you find one that has your "session" cookie. Copy the contents of
@@ -79,12 +79,31 @@ cargo run <day>
 You should see something like the following:
 
 ```bash
-❯ cargo run 1
-    Finished dev [unoptimized + debuginfo] target(s) in 0.00s
-     Running `target/debug/aoc-2023 1`
+$ cargo run 1
+    Finished dev [unoptimized + debuginfo] target(s) in 0.06s
+     Running `target\debug\aoc-2024.exe 1`
+Reading input data from .input/1.txt
 Solving day 1...
-Part 1: <solution> (0.000100000 seconds)
-Part 2: <solution> (0.000300000 seconds)
+Part 1: 2164381 (0.0002336 seconds)
+Part 2: 20719933 (0.0089312 seconds)
+```
+
+## Test inputs
+
+For development it often makes sense to work with smaller sample inputs
+such as the ones showin in the AoC task descriptions. For that, you can
+create a test input file in any location (e.g., `.input/day1_test.txt`)
+and then pass it as a second parameter to the run command:
+
+```bash
+$ cargo run 1 .input/1_test.txt
+   Compiling aoc-2024 v0.1.0 (C:\Users\bjoer\src\aoc)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.65s
+     Running `target\debug\aoc-2024.exe 1 .input/1_test.txt`
+Reading input data from .input/1_test.txt
+Solving day 1...
+Part 1: 11 (0.0000087 seconds)
+Part 2: 31 (0.0000027 seconds)
 ```
 
 ## Questions
