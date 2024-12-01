@@ -43,12 +43,12 @@ else
     --silent --max-time 10 --cookie "session=$SESSION" > ".input_$YEAR/$1.txt"
 fi
 
-if test -e "$YEAR/day$1.rs"; then
-  echo "$YEAR/day$1.rs already exists, skipping..."
+if test -e "src/day$1.rs"; then
+  echo "src/day$1.rs already exists, skipping..."
 else
-  echo "Creating boilerplate module for day $1 at $YEAR/day$1.rs..."
+  echo "Creating boilerplate module for day $1 at src/day$1.rs..."
 
-  cat <<-EOF > "$YEAR/day$1.rs"
+  cat <<-EOF > "src/day$1.rs"
 use crate::{DaySolution, FromInput};
 
 // TODO: Model the problem into this struct
@@ -83,11 +83,11 @@ then
   SED=gsed
 fi
 
-"$SED" -i "s|// MOD_MARKER|mod day$1;\nuse day$1::Day$1;\n// MOD_MARKER|" $YEAR/main.rs
-"$SED" -i "s|        // DAY_MARKER|        $1 => Box::new(Day$1::from_lines(lines)),\n        // DAY_MARKER|" $YEAR/main.rs
+"$SED" -i "s|// MOD_MARKER|mod day$1;\nuse day$1::Day$1;\n// MOD_MARKER|" src/main.rs
+"$SED" -i "s|        // DAY_MARKER|        $1 => Box::new(Day$1::from_lines(lines)),\n        // DAY_MARKER|" src/main.rs
 
 echo "Updated main.rs:"
-  git diff $YEAR/main.rs
+  git diff src/main.rs
   #echo "  mod day$1;"
   #echo "  use day$1::Day$1;"
   #echo "  $1 => Box::new(Day$1::from_lines(lines)),"

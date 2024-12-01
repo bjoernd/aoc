@@ -1,6 +1,8 @@
 use std::env;
 use std::io::{BufRead, BufReader};
 use std::time::{Duration, Instant};
+mod day1;
+use day1::Day1;
 // MOD_MARKER
 
 /// Reads the lines from the input file into a relevant
@@ -31,6 +33,7 @@ fn load_input(in_file: &String) -> impl Iterator<Item = String> {
 /// Gets the solution for the given day as a trait object.
 fn get_day_solution(day: usize, lines: impl Iterator<Item = String>) -> Box<dyn DaySolution> {
     match day {
+        1 => Box::new(Day1::from_lines(lines)),
         // DAY_MARKER
         _other => panic!("Day hasn't been solved yet"),
     }
@@ -59,7 +62,7 @@ fn main() {
         Some(s) => s,
     };
 
-    println!("{in_file}");
+    println!("Reading input data from {in_file}");
     let input = load_input(&in_file);
     let solution = get_day_solution(day, input);
     println!("Solving day {day}...");
