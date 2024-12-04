@@ -18,7 +18,6 @@ impl FromInput for Day3 {
 impl DaySolution for Day3 {
     fn part_one(&self) -> String {
         let mut sum = 0_usize;
-        let do_it = true;
 
         for l in &self.lines {
             let mut state = " "; /* the start state */
