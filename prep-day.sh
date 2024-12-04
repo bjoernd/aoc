@@ -15,7 +15,7 @@ set -e
 
 YEAR=2024
 
-mkdir -p ".input_$YEAR"
+mkdir -p .input
 mkdir -p "$YEAR"
 
 if test -z "$1"; then
@@ -34,13 +34,12 @@ if test -z "$SESSION"; then
   exit 1
 fi
 
-if test -e ".input_$YEAR/$1.txt"; then
+if test -e ".input/$1.txt"; then
   echo "Data already exists for day $1, skipping download..."
 else
   echo "Downloading data for day $1 to .input/$1.txt..."
-  mkdir -p .input
   curl "https://adventofcode.com/$YEAR/day/$1/input" \
-    --silent --max-time 10 --cookie "session=$SESSION" > ".input_$YEAR/$1.txt"
+    --silent --max-time 10 --cookie "session=$SESSION" > ".input/$1.txt"
 fi
 
 if test -e "src/day$1.rs"; then
