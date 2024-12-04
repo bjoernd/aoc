@@ -59,16 +59,36 @@ fn diff_check(v: &Vec<i32>, threshold: i32) -> bool {
     true
 }
 
+fn check_slice(r: &Vec<i32>) -> bool {
+    if is_increasing(r) || is_decreasing(r) {
+        if diff_check(r, 3) {
+            return true;
+        }
+    }
+    false
+}
+
+fn check_subsets(v: &Vec<i32>) -> bool {
+    if check_slice(v) { return true; }
+
+    for i in 0 .. v.len() {
+        let all = [ &v[..i], &v[i+1..] ].concat();
+
+        if is_increasing(&all) || is_decreasing(&all) {
+            if diff_check(&all, 3) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
 impl DaySolution for Day2 {
     fn part_one(&self) -> String {
         let mut sum = 0_usize;
         
         for r in &self.reports {
-            if is_increasing(r) || is_decreasing(r) {
-                if diff_check(r, 3) {
-                    sum += 1;
-                }
-            }
+            if check_slice(r) { sum += 1; }
         }
 
         sum.to_string()
@@ -76,7 +96,11 @@ impl DaySolution for Day2 {
 
     fn part_two(&self) -> String {
         let mut sum = 0_usize;
-        todo!("Solve part two of day 2 using your parsed input");
+        for r in &self.reports {
+            if check_subsets(r) {
+                sum += 1;
+            }
+        }
         sum.to_string()
     }
 }
