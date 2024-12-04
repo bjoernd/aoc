@@ -126,7 +126,7 @@ impl DaySolution for Day3 {
             let mut mul1 = 0;
             let mut mul2 = 0;
             for c in l.chars() {
-                println!("Char: {} State: {}", c, state);
+                //println!("Char: {} State: {}", c, state);
                 match state {
                     " " => {
                         if c == 'm' {
@@ -187,7 +187,7 @@ impl DaySolution for Day3 {
                         } else if c == ')' {
                             if num_read > 0 {
                                  state = " ";
-                                 println!("MUL1: {} MUL2: {} [active? {}]", mul1, mul2, do_it);
+                                 //println!("MUL1: {} MUL2: {} [active? {}]", mul1, mul2, do_it);
                                  if do_it {
                                     sum += (mul1 * mul2) as usize;
                                  }
