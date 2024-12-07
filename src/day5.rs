@@ -1,13 +1,13 @@
-use std::collections::HashMap;
 use itertools::Itertools;
+use std::collections::HashMap;
 
 use crate::{DaySolution, FromInput};
 
 // TODO: Model the problem into this struct
 pub struct Day5 {
     /* Rules map X -> List of pages that must come after X */
-    rules : HashMap<u32, Vec<u32>>,
-    orders : Vec<Vec<u32>>
+    rules: HashMap<u32, Vec<u32>>,
+    orders: Vec<Vec<u32>>,
 }
 
 impl FromInput for Day5 {
@@ -25,13 +25,17 @@ impl FromInput for Day5 {
                 let rule = l.split("|").collect_vec();
                 let first = u32::from_str_radix(rule[0], 10).unwrap();
                 let second = u32::from_str_radix(rule[1], 10).unwrap();
-                rules.entry(first).and_modify(|x| x.push(second)).or_insert(vec![second]);
+                rules
+                    .entry(first)
+                    .and_modify(|x| x.push(second))
+                    .or_insert(vec![second]);
             } else {
-                orders.push(l.split(",")
+                orders.push(
+                    l.split(",")
                         .collect_vec()
                         .into_iter()
                         .map(|x| u32::from_str_radix(x, 10).unwrap())
-                        .collect_vec()
+                        .collect_vec(),
                 );
             }
         }
@@ -46,25 +50,24 @@ impl Day5 {
             for pre in &printed {
                 if self.rules[item].contains(pre) {
                     /*println!("Found rule violation: Order {:?} Item {} must not come after item {}",
-                        order, item, pre);*/
+                    order, item, pre);*/
                     return false;
                 }
             }
             printed.push(*item);
         }
-        
+
         true
     }
 }
 
 impl DaySolution for Day5 {
-
     fn part_one(&self) -> String {
         let mut sum = 0_usize;
         for order in &self.orders {
             if self.order_is_valid(order) {
                 /*println!("Valid order: {:?}", order);*/
-                let middle = order[order.len()/2];
+                let middle = order[order.len() / 2];
                 sum += middle as usize;
             }
         }
@@ -74,14 +77,14 @@ impl DaySolution for Day5 {
     fn part_two(&self) -> String {
         let mut sum = 0_usize;
         for order in &self.orders {
-            if ! self.order_is_valid(order) {
+            if !self.order_is_valid(order) {
                 //println!("=== Invalid order: {:?}", order);
 
                 let mut new_order = order.clone();
 
                 /* Basic idea: find a rule violation. Swap the violating
                    elements. Repeat until the list is valid.
-                   
+
                    I did think about the potential of never reaching a quiet state, but
                    that apparently wasn't necessary. One would likely have to determine
                    a maximum number of swaps after which we have swapped all the numbers
@@ -100,10 +103,12 @@ impl DaySolution for Day5 {
                                 break;
                             }
                         }
-                        if !valid { break; }
+                        if !valid {
+                            break;
+                        }
                     }
                 }
-                let middle = new_order[new_order.len()/2];
+                let middle = new_order[new_order.len() / 2];
                 sum += middle as usize;
             }
         }

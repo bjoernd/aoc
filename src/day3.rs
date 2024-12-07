@@ -2,7 +2,7 @@ use crate::{DaySolution, FromInput};
 
 // TODO: Model the problem into this struct
 pub struct Day3 {
-    lines : Vec<String>
+    lines: Vec<String>,
 }
 
 impl FromInput for Day3 {
@@ -11,7 +11,7 @@ impl FromInput for Day3 {
         for l in _lines {
             ls.push(l);
         }
-        Day3{ lines: ls }
+        Day3 { lines: ls }
     }
 }
 
@@ -35,21 +35,21 @@ impl DaySolution for Day3 {
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "m" => {
                         if c == 'u' {
                             state = "u";
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "u" => {
                         if c == 'l' {
                             state = "l";
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "l" => {
                         if c == '(' {
                             state = "(";
@@ -57,60 +57,68 @@ impl DaySolution for Day3 {
                         } else {
                             state = " ";
                         }
-                    },
-                    "(" => { /* reading up to three numbers */
+                    }
+                    "(" => {
+                        /* reading up to three numbers */
                         if c.is_numeric() {
                             num_read += 1;
-                            if num_read > 3 { state = " "; }
-                            else {
+                            if num_read > 3 {
+                                state = " ";
+                            } else {
                                 mul1 *= 10;
                                 mul1 += c as i32 - '0' as i32;
                             }
                         } else if c == ',' {
-                            if num_read > 0 { state = ","; num_read = 0; }
-                            else { state = " "; }
+                            if num_read > 0 {
+                                state = ",";
+                                num_read = 0;
+                            } else {
+                                state = " ";
+                            }
                         } else {
                             state = " ";
                             mul1 = 0;
                             mul2 = 0;
                         }
-                    },
+                    }
                     "," => {
                         if c.is_numeric() {
                             num_read += 1;
-                            if num_read > 3 { state = " "; }
-                            else {
+                            if num_read > 3 {
+                                state = " ";
+                            } else {
                                 mul2 *= 10;
                                 mul2 += c as i32 - '0' as i32;
                             }
                         } else if c == ')' {
                             if num_read > 0 {
-                                 state = " ";
-                                 //println!("MUL1: {} MUL2: {}", mul1, mul2);
-                                 sum += (mul1 * mul2) as usize;
-                                 mul1 = 0;
-                                 mul2 = 0;
+                                state = " ";
+                                //println!("MUL1: {} MUL2: {}", mul1, mul2);
+                                sum += (mul1 * mul2) as usize;
+                                mul1 = 0;
+                                mul2 = 0;
+                            } else {
+                                state = " ";
                             }
-                            else { state = " "; }
                         } else {
                             state = " ";
                             mul1 = 0;
                             mul2 = 0;
                         }
-                    },
+                    }
                     "d" => {
                         if c == 'o' {
                             state = "o";
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     _ => {
                         state = " ";
                     }
                 }
             }
-        };
+        }
 
         sum.to_string()
     }
@@ -135,21 +143,21 @@ impl DaySolution for Day3 {
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "m" => {
                         if c == 'u' {
                             state = "u";
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "u" => {
                         if c == 'l' {
                             state = "l";
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "l" => {
                         if c == '(' {
                             state = "(";
@@ -157,56 +165,64 @@ impl DaySolution for Day3 {
                         } else {
                             state = " ";
                         }
-                    },
-                    "(" => { /* reading up to three numbers */
+                    }
+                    "(" => {
+                        /* reading up to three numbers */
                         if c.is_numeric() {
                             num_read += 1;
-                            if num_read > 3 { state = " "; }
-                            else {
+                            if num_read > 3 {
+                                state = " ";
+                            } else {
                                 mul1 *= 10;
                                 mul1 += c as i32 - '0' as i32;
                             }
                         } else if c == ',' {
-                            if num_read > 0 { state = ","; num_read = 0; }
-                            else { state = " "; }
+                            if num_read > 0 {
+                                state = ",";
+                                num_read = 0;
+                            } else {
+                                state = " ";
+                            }
                         } else {
                             state = " ";
                             mul1 = 0;
                             mul2 = 0;
                         }
-                    },
+                    }
                     "," => {
                         if c.is_numeric() {
                             num_read += 1;
-                            if num_read > 3 { state = " "; }
-                            else {
+                            if num_read > 3 {
+                                state = " ";
+                            } else {
                                 mul2 *= 10;
                                 mul2 += c as i32 - '0' as i32;
                             }
                         } else if c == ')' {
                             if num_read > 0 {
-                                 state = " ";
-                                 //println!("MUL1: {} MUL2: {} [active? {}]", mul1, mul2, do_it);
-                                 if do_it {
+                                state = " ";
+                                //println!("MUL1: {} MUL2: {} [active? {}]", mul1, mul2, do_it);
+                                if do_it {
                                     sum += (mul1 * mul2) as usize;
-                                 }
-                                 mul1 = 0;
-                                 mul2 = 0;
+                                }
+                                mul1 = 0;
+                                mul2 = 0;
+                            } else {
+                                state = " ";
                             }
-                            else { state = " "; }
                         } else {
                             state = " ";
                             mul1 = 0;
                             mul2 = 0;
                         }
-                    },
+                    }
                     "d" => {
                         if c == 'o' {
                             state = "o";
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "o" => {
                         if c == 'n' {
                             state = "DON";
@@ -215,34 +231,34 @@ impl DaySolution for Day3 {
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "DON" => {
                         if c == '\'' {
                             state = "DON_";
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "DON_" => {
                         if c == 't' {
                             state = "DON_T";
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "DON_T" => {
                         if c == '(' {
                             state = "DONT_OPEN";
                         } else {
                             state = " ";
                         }
-                    },
+                    }
                     "DO_OPEN" => {
                         if c == ')' {
                             do_it = true;
                         }
                         state = " ";
-                    },
+                    }
                     "DONT_OPEN" => {
                         if c == ')' {
                             do_it = false;
@@ -254,7 +270,7 @@ impl DaySolution for Day3 {
                     }
                 }
             }
-        };
+        }
         sum.to_string()
     }
 }

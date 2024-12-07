@@ -1,4 +1,4 @@
-use std::{i32::MAX};
+use std::i32::MAX;
 
 use itertools::Itertools;
 use num::abs;
@@ -6,23 +6,23 @@ use num::abs;
 use crate::{DaySolution, FromInput};
 
 // TODO: Model the problem into this struct
-pub struct Day2
-{
-    reports : Vec<Vec<i32>>
+pub struct Day2 {
+    reports: Vec<Vec<i32>>,
 }
 
 impl FromInput for Day2 {
     fn from_lines(_lines: impl Iterator<Item = String>) -> Self {
         let mut reports = vec![];
         for l in _lines {
-            let x : Vec<i32> = l.split(" ")
-                                .into_iter()
-                                .map(|a| i32::from_str_radix(a, 10).unwrap())
-                                .collect_vec();
+            let x: Vec<i32> = l
+                .split(" ")
+                .into_iter()
+                .map(|a| i32::from_str_radix(a, 10).unwrap())
+                .collect_vec();
             reports.push(x);
         }
 
-        Day2{ reports }
+        Day2 { reports }
     }
 }
 
@@ -69,10 +69,12 @@ fn check_slice(r: &Vec<i32>) -> bool {
 }
 
 fn check_subsets(v: &Vec<i32>) -> bool {
-    if check_slice(v) { return true; }
+    if check_slice(v) {
+        return true;
+    }
 
-    for i in 0 .. v.len() {
-        let all = [ &v[..i], &v[i+1..] ].concat();
+    for i in 0..v.len() {
+        let all = [&v[..i], &v[i + 1..]].concat();
 
         if is_increasing(&all) || is_decreasing(&all) {
             if diff_check(&all, 3) {
@@ -86,9 +88,11 @@ fn check_subsets(v: &Vec<i32>) -> bool {
 impl DaySolution for Day2 {
     fn part_one(&self) -> String {
         let mut sum = 0_usize;
-        
+
         for r in &self.reports {
-            if check_slice(r) { sum += 1; }
+            if check_slice(r) {
+                sum += 1;
+            }
         }
 
         sum.to_string()
