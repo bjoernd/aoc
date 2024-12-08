@@ -50,7 +50,6 @@ else
   cat <<-EOF > "src/day$1.rs"
 use crate::{DaySolution, FromInput};
 
-// TODO: Model the problem into this struct
 pub struct Day$1;
 
 impl FromInput for Day$1 {
