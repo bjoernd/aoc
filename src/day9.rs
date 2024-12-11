@@ -44,10 +44,12 @@ fn next_empty_idx(blocks: &Vec<u32>, start: usize) -> usize {
     0
 }
 
-fn next_file_idx(blocks: &Vec<u32>, start: usize) -> usize {
-    for i in (0..start).rev() {
+fn next_empty_idx_with_size(blocks: &Vec<u32>, start: usize, size: usize) -> usize {
+    for i in start..blocks.len() {
         if blocks[i] == Day9::EMPTY_NUM {
-            return i+1;
+            let mut j = i;
+            while blocks[j] == Day9::EMPTY_NUM && j < blocks.len()-1 { j += 1; }
+            if j - i >= size { return i; }
         }
     }
 
@@ -81,7 +83,48 @@ impl DaySolution for Day9 {
 
     fn part_two(&self) -> String {
         let mut sum = 0_usize;
-        todo!("Solve part two of day 9 using your parsed input");
+
+        let mut i = self.blocks.len() - 1;
+        let mut blocks = self.blocks.clone();
+
+        while i > 0 {
+            let id = blocks[i];
+
+            /*
+            println!("==========================================================================================");
+            for j in 0..blocks.len() {
+                if j == i {
+                    println!("*{} -> {}", j, blocks[j]);
+                } else {
+                    println!(" {} -> {}", j, blocks[j]);
+                }
+            }
+            */
+
+            if id != Day9::EMPTY_NUM {
+                let mut start = i;
+                while blocks[start] == id && start > 0 { start -= 1; }
+                let ex_size = i - start;
+                let new_start = next_empty_idx_with_size(&blocks, 0, ex_size);
+                //println!("  next_empy_w_size({}, {}) = {}", 0, ex_size, new_start);
+                if new_start != 0 && new_start < start {
+                    for j in 0..ex_size {
+                        blocks[j + new_start] = id;
+                        blocks[j + start+1] = Day9::EMPTY_NUM;
+                    }
+                }
+
+                if start > 0 { i = start; } else { i = 0; }
+            } else {
+                i -= 1;
+            }
+        }
+
+        for j in 0..blocks.len() {
+            //println!("{} -> {}", j, blocks[j]);
+            if blocks[j] != Day9::EMPTY_NUM { sum += j * blocks[j] as usize; }
+        }
+
         sum.to_string()
     }
 }
