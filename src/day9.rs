@@ -57,7 +57,25 @@ fn next_file_idx(blocks: &Vec<u32>, start: usize) -> usize {
 impl DaySolution for Day9 {
     fn part_one(&self) -> String {
         let mut sum = 0_usize;
-        todo!("Solve part one of day 9 using your parsed input");
+
+        let mut i = self.blocks.len() - 1;
+        let mut blocks = self.blocks.clone();
+        let mut free = next_empty_idx(&blocks, 0);
+
+        while free < i {
+            if blocks[i] != Day9::EMPTY_NUM {
+                blocks[free] = blocks[i];
+                blocks[i] = Day9::EMPTY_NUM;
+                free = next_empty_idx(&blocks, free);
+            }
+            i -= 1;
+        }
+
+        for j in 0..i+1 {
+            //println!("{} -> {}", j, blocks[j]);
+            if blocks[j] != Day9::EMPTY_NUM { sum += j * blocks[j] as usize; }
+        }
+
         sum.to_string()
     }
 
