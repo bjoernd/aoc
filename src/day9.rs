@@ -1,7 +1,7 @@
 use crate::{DaySolution, FromInput};
 
 pub struct Day9 {
-    blocks : Vec<u32>,
+    blocks: Vec<u32>,
 }
 
 impl Day9 {
@@ -15,18 +15,18 @@ impl FromInput for Day9 {
         let mut blocks = vec![];
         for l in _lines {
             for c in l.chars() {
-               let num = c.to_digit(10).unwrap();
-               if in_file {
-                 for _ in 0..num {
-                    blocks.push(file_id);
-                 }
-                 file_id += 1;
-               } else {
-                for _ in 0..num {
-                    blocks.push(Day9::EMPTY_NUM);
+                let num = c.to_digit(10).unwrap();
+                if in_file {
+                    for _ in 0..num {
+                        blocks.push(file_id);
+                    }
+                    file_id += 1;
+                } else {
+                    for _ in 0..num {
+                        blocks.push(Day9::EMPTY_NUM);
+                    }
                 }
-               }
-               in_file = !in_file;
+                in_file = !in_file;
             }
         }
 
@@ -48,8 +48,12 @@ fn next_empty_idx_with_size(blocks: &Vec<u32>, start: usize, size: usize) -> usi
     for i in start..blocks.len() {
         if blocks[i] == Day9::EMPTY_NUM {
             let mut j = i;
-            while blocks[j] == Day9::EMPTY_NUM && j < blocks.len()-1 { j += 1; }
-            if j - i >= size { return i; }
+            while blocks[j] == Day9::EMPTY_NUM && j < blocks.len() - 1 {
+                j += 1;
+            }
+            if j - i >= size {
+                return i;
+            }
         }
     }
 
@@ -73,9 +77,11 @@ impl DaySolution for Day9 {
             i -= 1;
         }
 
-        for j in 0..i+1 {
+        for j in 0..i + 1 {
             //println!("{} -> {}", j, blocks[j]);
-            if blocks[j] != Day9::EMPTY_NUM { sum += j * blocks[j] as usize; }
+            if blocks[j] != Day9::EMPTY_NUM {
+                sum += j * blocks[j] as usize;
+            }
         }
 
         sum.to_string()
@@ -103,18 +109,24 @@ impl DaySolution for Day9 {
 
             if id != Day9::EMPTY_NUM {
                 let mut start = i;
-                while blocks[start] == id && start > 0 { start -= 1; }
+                while blocks[start] == id && start > 0 {
+                    start -= 1;
+                }
                 let ex_size = i - start;
                 let new_start = next_empty_idx_with_size(&blocks, 0, ex_size);
                 //println!("  next_empy_w_size({}, {}) = {}", 0, ex_size, new_start);
                 if new_start != 0 && new_start < start {
                     for j in 0..ex_size {
                         blocks[j + new_start] = id;
-                        blocks[j + start+1] = Day9::EMPTY_NUM;
+                        blocks[j + start + 1] = Day9::EMPTY_NUM;
                     }
                 }
 
-                if start > 0 { i = start; } else { i = 0; }
+                if start > 0 {
+                    i = start;
+                } else {
+                    i = 0;
+                }
             } else {
                 i -= 1;
             }
@@ -122,7 +134,9 @@ impl DaySolution for Day9 {
 
         for j in 0..blocks.len() {
             //println!("{} -> {}", j, blocks[j]);
-            if blocks[j] != Day9::EMPTY_NUM { sum += j * blocks[j] as usize; }
+            if blocks[j] != Day9::EMPTY_NUM {
+                sum += j * blocks[j] as usize;
+            }
         }
 
         sum.to_string()
