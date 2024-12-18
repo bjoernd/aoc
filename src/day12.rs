@@ -22,6 +22,7 @@ impl FromInput for Day12 {
 }
 
 impl Day12 {
+    #[allow(dead_code)]
     fn print(&self) {
         for line in &self.map {
             for c in line {
@@ -111,8 +112,8 @@ impl DaySolution for Day12 {
 
                 //println!("Area {}: {}x{}={}", area_id, area, bounds, area*bounds);
                 sum += area * bounds;
-                area = 0usize;
-                bounds = 0usize;
+                // area = 0usize;
+                // bounds = 0usize;
             }
         }
 
@@ -156,9 +157,9 @@ impl DaySolution for Day12 {
                         if self.map[x - 1][y] != area_id {
                             // upper bound
                             if !is_known_bound(x - 1, y, &up_bounds) {
-                                let mut l1 = x - 1;
+                                let l1 = x - 1;
                                 let mut c1 = y;
-                                let mut l2 = l1;
+                                let l2 = l1;
                                 let mut c2 = c1;
 
                                 while self.map[l1 + 1][c1 - 1] == area_id
@@ -181,9 +182,9 @@ impl DaySolution for Day12 {
 
                         if self.map[x + 1][y] != area_id {
                             if !is_known_bound(x + 1, y, &down_bounds) {
-                                let mut l1 = x + 1;
+                                let l1 = x + 1;
                                 let mut c1 = y;
-                                let mut l2 = l1;
+                                let l2 = l1;
                                 let mut c2 = c1;
 
                                 while self.map[l1 - 1][c1 - 1] == area_id
@@ -207,9 +208,9 @@ impl DaySolution for Day12 {
                         if self.map[x][y - 1] != area_id {
                             if !is_known_bound(x, y - 1, &left_bounds) {
                                 let mut l1 = x;
-                                let mut c1 = y - 1;
+                                let c1 = y - 1;
                                 let mut l2 = l1;
-                                let mut c2 = c1;
+                                let c2 = c1;
 
                                 while self.map[l1 - 1][c1 + 1] == area_id
                                     && self.map[l1 - 1][c1] != area_id
@@ -232,9 +233,9 @@ impl DaySolution for Day12 {
                         if self.map[x][y + 1] != area_id {
                             if !is_known_bound(x, y + 1, &right_bounds) {
                                 let mut l1 = x;
-                                let mut c1 = y + 1;
+                                let c1 = y + 1;
                                 let mut l2 = l1;
-                                let mut c2 = c1;
+                                let c2 = c1;
 
                                 while self.map[l1 - 1][c1 - 1] == area_id
                                     && self.map[l1 - 1][c1] != area_id
@@ -263,7 +264,7 @@ impl DaySolution for Day12 {
 
                 //println!("Area {}: {}x{}={}", area_id, area, bounds, area*bounds);
                 sum += area * bounds;
-                area = 0usize;
+                // area = 0usize;
                 up_bounds.clear();
                 down_bounds.clear();
                 right_bounds.clear();

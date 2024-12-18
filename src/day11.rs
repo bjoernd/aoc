@@ -1,6 +1,6 @@
 use cached::proc_macro::cached;
 use num::pow;
-use std::{collections::HashMap, hash::Hash, time::Instant};
+use std::collections::HashMap;
 
 use itertools::Itertools;
 
@@ -61,6 +61,7 @@ fn compute_one(n: usize) -> Vec<usize> {
 
 /* Tried this solution first which performs the actual iterations and generates all stones as is.
 This works fine for part 1 and runs out of memory for part 2 due to caching. */
+#[allow(dead_code)]
 fn compute(n: usize, iterations: usize) -> usize {
     let mut res = vec![n];
 

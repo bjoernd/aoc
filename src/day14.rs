@@ -1,5 +1,5 @@
 use crate::{DaySolution, FromInput};
-use itertools::{max, Itertools};
+use itertools::Itertools;
 use std::isize;
 
 #[derive(Copy, Clone)]
@@ -128,7 +128,7 @@ fn count(bots: &Vec<(Position, Velocity)>, lines: usize, cols: usize) -> usize {
     nw * ne * sw * se
 }
 
-fn has_contiguous_bots(bots: &Vec<(Position, Velocity)>, lines: usize, cols: usize) -> bool {
+fn has_contiguous_bots(bots: &Vec<(Position, Velocity)>, lines: usize) -> bool {
     let mut max_consecutive = 0;
     for l in 0..lines as isize {
         let mut bots_in_line = bots.iter().filter(|x| x.0.l == l).collect_vec();
@@ -154,7 +154,7 @@ impl DaySolution for Day14 {
     fn part_one(&self) -> String {
         let mut bots = self.bots.clone();
 
-        for i in 0..100 {
+        for _ in 0..100 {
             bots = move_one(&bots, self.lines, self.cols);
         }
         print(&bots, self.lines, self.cols);
@@ -167,7 +167,7 @@ impl DaySolution for Day14 {
 
         for i in 0..100000 {
             bots = move_one(&bots, self.lines, self.cols);
-            if has_contiguous_bots(&bots, self.lines, self.cols) {
+            if has_contiguous_bots(&bots, self.lines) {
                 res = i + 1;
                 print(&bots, self.lines, self.cols);
                 break;

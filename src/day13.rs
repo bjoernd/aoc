@@ -1,9 +1,5 @@
-use std::cmp::min;
-
-use itertools::Itertools;
-use rayon::prelude::*;
-
 use crate::{DaySolution, FromInput};
+use itertools::Itertools;
 
 struct XPair {
     x: usize,
@@ -68,9 +64,6 @@ impl FromInput for Day13 {
             buttonb: bb,
             prize: pr,
         });
-        ba = XPair { x: 0, y: 0 };
-        bb = XPair { x: 0, y: 0 };
-        pr = XPair { x: 0, y: 0 };
 
         Day13 { inputs }
     }
@@ -103,20 +96,20 @@ impl DaySolution for Day13 {
         for problem in &self.inputs {
             //println!("?? {} {}", problem.prize.x, problem.prize.y);
 
-            let PX = problem.prize.x as isize;
-            let PY = problem.prize.y as isize;
+            let px = problem.prize.x as isize;
+            let py = problem.prize.y as isize;
             let x1 = problem.buttona.x as isize;
             let x2 = problem.buttonb.x as isize;
             let y1 = problem.buttona.y as isize;
             let y2 = problem.buttonb.y as isize;
 
-            let b = (PY * x1 - y1 * PX) / (y2 * x1 - y1 * x2);
-            let a = (PX - b * x2) / x1;
+            let b = (py * x1 - y1 * px) / (y2 * x1 - y1 * x2);
+            let a = (px - b * x2) / x1;
 
             /* We only want non-fractional integers, so validate by replacing back */
-            if a * x1 + b * x2 == PX && a * y1 + b * y2 == PY {
+            if a * x1 + b * x2 == px && a * y1 + b * y2 == py {
                 //println!("A = {} B = {}", a, b);
-                sum += (3 * a as usize + b as usize);
+                sum += 3 * a as usize + b as usize;
             }
         }
 
@@ -132,20 +125,20 @@ impl DaySolution for Day13 {
         for problem in &self.inputs {
             //println!("?? {} {}", problem.prize.x, problem.prize.y);
 
-            let PX = problem.prize.x as isize + 10000000000000;
-            let PY = problem.prize.y as isize + 10000000000000;
+            let px = problem.prize.x as isize + 10000000000000;
+            let py = problem.prize.y as isize + 10000000000000;
             let x1 = problem.buttona.x as isize;
             let x2 = problem.buttonb.x as isize;
             let y1 = problem.buttona.y as isize;
             let y2 = problem.buttonb.y as isize;
 
-            let b = (PY * x1 - y1 * PX) / (y2 * x1 - y1 * x2);
-            let a = (PX - b * x2) / x1;
+            let b = (py * x1 - y1 * px) / (y2 * x1 - y1 * x2);
+            let a = (px - b * x2) / x1;
 
             /* We only want non-fractional integers, so validate by replacing back */
-            if a * x1 + b * x2 == PX && a * y1 + b * y2 == PY {
+            if a * x1 + b * x2 == px && a * y1 + b * y2 == py {
                 //println!("A = {} B = {}", a, b);
-                sum += (3 * a as usize + b as usize);
+                sum += 3 * a as usize + b as usize;
             }
         }
 
