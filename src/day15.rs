@@ -1,6 +1,8 @@
-use itertools::Itertools;
+use std::io::Read;
 
 use crate::{DaySolution, FromInput};
+use colored::Colorize;
+use itertools::Itertools;
 
 pub struct Day15 {
     map: Vec<Vec<char>>,
@@ -30,11 +32,22 @@ impl FromInput for Day15 {
 }
 
 fn print(map: &Vec<Vec<char>>) {
+    let mut idx = 0;
     for l in map {
+        print!("{:3} ", idx);
         for c in l {
-            print!("{}", c);
+            if *c == ROBOT {
+                print!("{}", c.to_string().bold().blue());
+            } else if *c == WALL {
+                print!("{}", c.to_string().bold().white());
+            } else if *c == BOX || *c == BOX_L || *c == BOX_R {
+                print!("{}", c.to_string().yellow());
+            } else {
+                print!("{}", c);
+            }
         }
         println!();
+        idx += 1;
     }
 }
 
@@ -123,12 +136,6 @@ fn move_two(
                 non_box_l += vl;
                 non_box_c += vc;
             }
-            println!(
-                "non box @ {} {} = {}",
-                non_box_l,
-                non_box_c,
-                map_access!(map, non_box_l, non_box_c)
-            );
             if map_access!(map, non_box_l, non_box_c) == EMPTY {
                 while non_box_c != target_c || non_box_l != target_l {
                     map_access!(map, non_box_l, non_box_c) =
@@ -139,7 +146,7 @@ fn move_two(
                 map_access!(map, target_l, target_c) = EMPTY;
             }
         } else {
-            todo!("Implement");
+            move_vertical(map, target_l, target_c, vl);
         }
     }
 
@@ -154,11 +161,70 @@ fn move_two(
     (target_l, target_c)
 }
 
-fn compute(map: &Vec<Vec<char>>) -> usize {
+fn can_move_vertical(map: &Vec<Vec<char>>, l: isize, c: isize, vl: isize) -> bool {
+    let left_col = if map_access!(map, l, c) == BOX_L {
+        c
+    } else {
+        c - 1
+    };
+
+    if map_access!(map, l + vl, left_col) == WALL || map_access!(map, l + vl, left_col + 1) == WALL
+    {
+        return false;
+    }
+
+    if map_access!(map, l + vl, left_col) == EMPTY
+        && map_access!(map, l + vl, left_col + 1) == EMPTY
+    {
+        return true;
+    }
+
+    let ls = if map_access!(map, l + vl, left_col) == EMPTY {
+        true
+    } else {
+        can_move_vertical(map, l + vl, left_col, vl)
+    };
+    let rs = if map_access!(map, l + vl, left_col + 1) == EMPTY {
+        true
+    } else {
+        can_move_vertical(map, l + vl, left_col + 1, vl)
+    };
+
+    //println!("can_move_vert({} {}) = LS {} RS {}", l+vl, left_col, ls, rs);
+
+    ls && rs
+}
+
+fn move_vertical(map: &mut Vec<Vec<char>>, l: isize, c: isize, vl: isize) {
+    let left_col = if map_access!(map, l, c) == BOX_L {
+        c
+    } else {
+        c - 1
+    };
+
+    // println!("vert({},{},{}, lc = {} '{}')", l, c, vl, left_col, map_access!(map, l, c));
+
+    if can_move_vertical(&map, l, c, vl) {
+        if is_box(map, l + vl, left_col) {
+            move_vertical(map, l + vl, left_col, vl);
+        }
+
+        if is_box(map, l + vl, left_col + 1) {
+            move_vertical(map, l + vl, left_col + 1, vl);
+        }
+
+        map_access!(map, l + vl, left_col) = BOX_L;
+        map_access!(map, l + vl, left_col + 1) = BOX_R;
+        map_access!(map, l, left_col) = EMPTY;
+        map_access!(map, l, left_col + 1) = EMPTY;
+    }
+}
+
+fn compute(map: &Vec<Vec<char>>, target: char) -> usize {
     let mut res = 0;
     for i in 0..map.len() {
         for j in 0..map[0].len() {
-            if map_access!(map, i, j) == BOX {
+            if map_access!(map, i, j) == target {
                 res += i * 100 + j;
             }
         }
@@ -200,7 +266,7 @@ impl DaySolution for Day15 {
             // print(&map);
         }
 
-        compute(&map).to_string()
+        compute(&map, BOX).to_string()
     }
 
     fn part_two(&self) -> String {
@@ -239,11 +305,12 @@ impl DaySolution for Day15 {
             map.push(new_line);
         }
 
-        println!("Robot starts at {},{}", rob_l, rob_c);
-        print(&map);
+        // println!("Robot starts at {},{}", rob_l, rob_c);
+        // print(&map);
 
         for mov in &self.moves {
-            println!("--- MOVE: {} ---", mov);
+            // println!("--- ROBOT @ {},{} ---- MOVE: {} ---", rob_l, rob_c, mov);
+            // print(&map);
             match mov {
                 '>' => {
                     (rob_l, rob_c) = move_two(&mut map, 0, 1, rob_l, rob_c);
@@ -261,9 +328,22 @@ impl DaySolution for Day15 {
                     panic!("Invalid move: {}", mov);
                 }
             }
-            print(&map);
+            if !validate(&map) {
+                panic!("validation failed");
+            }
         }
 
-        0.to_string()
+        compute(&map, '[').to_string()
     }
+}
+
+fn validate(map: &Vec<Vec<char>>) -> bool {
+    for l in 0..map.len() - 1 {
+        for c in 0..map[0].len() - 1 {
+            if map_access!(map, l, c) == BOX_L && map_access!(map, l, c + 1) != BOX_R {
+                return false;
+            }
+        }
+    }
+    true
 }
