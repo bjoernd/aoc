@@ -31,6 +31,8 @@ mod day14;
 use day14::Day14;
 mod day15;
 use day15::Day15;
+mod day16;
+use day16::Day16;
 // MOD_MARKER
 
 /// Reads the lines from the input file into a relevant
@@ -76,6 +78,7 @@ fn get_day_solution(day: usize, lines: impl Iterator<Item = String>) -> Box<dyn 
         13 => Box::new(Day13::from_lines(lines)),
         14 => Box::new(Day14::from_lines(lines)),
         15 => Box::new(Day15::from_lines(lines)),
+        16 => Box::new(Day16::from_lines(lines)),
         // DAY_MARKER
         _other => panic!("Day hasn't been solved yet"),
     }
