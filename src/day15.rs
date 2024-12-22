@@ -1,5 +1,3 @@
-use std::io::Read;
-
 use crate::{DaySolution, FromInput};
 use colored::Colorize;
 use itertools::Itertools;
@@ -31,6 +29,7 @@ impl FromInput for Day15 {
     }
 }
 
+#[allow(dead_code)]
 fn print(map: &Vec<Vec<char>>) {
     let mut idx = 0;
     for l in map {
