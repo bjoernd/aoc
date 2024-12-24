@@ -1,6 +1,8 @@
 use std::env;
 use std::io::{BufRead, BufReader};
 use std::time::{Duration, Instant};
+#[macro_use]
+extern crate num_derive;
 mod day1;
 use day1::Day1;
 mod day2;
@@ -33,6 +35,8 @@ mod day15;
 use day15::Day15;
 mod day16;
 use day16::Day16;
+mod day17;
+use day17::Day17;
 // MOD_MARKER
 
 /// Reads the lines from the input file into a relevant
@@ -79,6 +83,7 @@ fn get_day_solution(day: usize, lines: impl Iterator<Item = String>) -> Box<dyn 
         14 => Box::new(Day14::from_lines(lines)),
         15 => Box::new(Day15::from_lines(lines)),
         16 => Box::new(Day16::from_lines(lines)),
+        17 => Box::new(Day17::from_lines(lines)),
         // DAY_MARKER
         _other => panic!("Day hasn't been solved yet"),
     }
