@@ -1,9 +1,9 @@
 use itertools::Itertools;
 use std::cmp::Ordering;
-use std::hash::Hash;
+use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::collections::BinaryHeap;
+use std::hash::Hash;
 use std::usize::MAX;
 
 use crate::{DaySolution, FromInput};
@@ -99,9 +99,16 @@ impl DaySolution for Day16 {
         for l in 0..self.map.len() {
             let mut resline = vec![];
             for c in 0..self.map[0].len() {
-                resline.push(Node{line: l, col: c, cost: MAX, direction: Direction::Unknown});
+                resline.push(Node {
+                    line: l,
+                    col: c,
+                    cost: MAX,
+                    direction: Direction::Unknown,
+                });
 
-                if c == start_c && l == start_l { continue; }
+                if c == start_c && l == start_l {
+                    continue;
+                }
 
                 if self.map[l][c] != '#' {
                     unvisited.insert(Node {
@@ -302,29 +309,29 @@ impl DaySolution for Day16 {
         // }
 
         /* Part 2: We start at the end. We move backwards based on what we found.
-           This gives us the actual shortest route found.
+          This gives us the actual shortest route found.
 
-           For alternative routes, we need to be aware of "gaps". Example excerpt
-           from a map:
+          For alternative routes, we need to be aware of "gaps". Example excerpt
+          from a map:
 
-              A    B    C    D    E
-            0 3008 4009 3010 4011 4012 ->
-            1 3007 #### 3009 #### ####
-            2 3006 #### 3008 #### ####
-         -> 3 2005 2006 2007 #### ####
+             A    B    C    D    E
+           0 3008 4009 3010 4011 4012 ->
+           1 3007 #### 3009 #### ####
+           2 3006 #### 3008 #### ####
+        -> 3 2005 2006 2007 #### ####
 
-            Starting at the bottom left (A3), there are two paths with identical
-            cost to the top right (E0). The paths split at A3 and meet again at C0.
-            The second path however found a lower cost trip to C0 and thus overwrote
-            C0's cost with the lower value, but then turns to D0 and at that point
-            gets the same cost as the first path which would have gone straight up from
-            A3 to A0 and then right.
+           Starting at the bottom left (A3), there are two paths with identical
+           cost to the top right (E0). The paths split at A3 and meet again at C0.
+           The second path however found a lower cost trip to C0 and thus overwrote
+           C0's cost with the lower value, but then turns to D0 and at that point
+           gets the same cost as the first path which would have gone straight up from
+           A3 to A0 and then right.
 
-            If we unroll paths backwards, this means we have to check straight lines
-            for "gaps" where a second path with a seemingly lower cost comes in. We then
-            need to check if going in a straight line we'd end up with a similarly optimal
-            path in any of the other directions and then pursue these as well.
-         */
+           If we unroll paths backwards, this means we have to check straight lines
+           for "gaps" where a second path with a seemingly lower cost comes in. We then
+           need to check if going in a straight line we'd end up with a similarly optimal
+           path in any of the other directions and then pursue these as well.
+        */
 
         let mut to_visit = BinaryHeap::<(usize, usize)>::new();
         let mut visited2 = HashSet::<(usize, usize)>::new();
@@ -348,20 +355,22 @@ impl DaySolution for Day16 {
 
             /* we are definitely a path node ourselves */
             path_nodes.insert((line, col));
-            
-            let (left_l, left_c) = (line, col-1);
-            let (right_l, right_c) = (line, col+1);
-            let (down_l, down_c) = (line+1, col);
-            let (up_l, up_c) = (line-1, col);
 
-            macro_rules!  check_and_push {
+            let (left_l, left_c) = (line, col - 1);
+            let (right_l, right_c) = (line, col + 1);
+            let (down_l, down_c) = (line + 1, col);
+            let (up_l, up_c) = (line - 1, col);
+
+            macro_rules! check_and_push {
                 ($dir:expr, $offset:expr) => {
-                    if my_cost > $offset + 1 &&
-                        results[$dir.0][$dir.1].cost == my_cost - 1 - $offset {
+                    if my_cost > $offset + 1
+                        && results[$dir.0][$dir.1].cost == my_cost - 1 - $offset
+                    {
                         to_visit.push(($dir.0, $dir.1));
                     }
-                    if my_cost > 1001 + $offset && 
-                        results[$dir.0][$dir.1].cost == my_cost - 1001 - $offset {
+                    if my_cost > 1001 + $offset
+                        && results[$dir.0][$dir.1].cost == my_cost - 1001 - $offset
+                    {
                         to_visit.push(($dir.0, $dir.1));
                     }
                 };
@@ -369,34 +378,34 @@ impl DaySolution for Day16 {
             // println!("{} {}", line, col);
 
             /* a direct predecessor has a cost of either current - 1 (if we moved
-               in a straight line) or current - 10001 (if we had to turn)
-             */
+              in a straight line) or current - 10001 (if we had to turn)
+            */
             if self.map[left_l][left_c] != '#' && my_cost > results[left_l][left_c].cost {
                 check_and_push!((left_l, left_c), 0);
-                check_and_push!((left_l-1, left_c), 1);
-                check_and_push!((left_l+1, left_c), 1);
-                check_and_push!((left_l, left_c-1), 1);
+                check_and_push!((left_l - 1, left_c), 1);
+                check_and_push!((left_l + 1, left_c), 1);
+                check_and_push!((left_l, left_c - 1), 1);
             }
 
-            if self.map[right_l][right_c] != '#' && my_cost > results[right_l][right_c].cost { 
+            if self.map[right_l][right_c] != '#' && my_cost > results[right_l][right_c].cost {
                 check_and_push!((right_l, right_c), 0);
-                check_and_push!((right_l-1, right_c), 1);
-                check_and_push!((right_l+1, right_c), 1);
-                check_and_push!((right_l, right_c+1), 1);
+                check_and_push!((right_l - 1, right_c), 1);
+                check_and_push!((right_l + 1, right_c), 1);
+                check_and_push!((right_l, right_c + 1), 1);
             }
 
             if self.map[up_l][up_c] != '#' && my_cost > results[up_l][up_c].cost {
                 check_and_push!((up_l, up_c), 0);
-                check_and_push!((up_l-1, up_c), 1);
-                check_and_push!((up_l, up_c-1), 1);
-                check_and_push!((up_l, up_c+1), 1);
+                check_and_push!((up_l - 1, up_c), 1);
+                check_and_push!((up_l, up_c - 1), 1);
+                check_and_push!((up_l, up_c + 1), 1);
             }
 
             if self.map[down_l][down_c] != '#' && my_cost > results[down_l][down_c].cost {
                 check_and_push!((down_l, down_c), 0);
-                check_and_push!((down_l+1, down_c), 1);
-                check_and_push!((down_l, down_c-1), 1);
-                check_and_push!((down_l, down_c+1), 1);
+                check_and_push!((down_l + 1, down_c), 1);
+                check_and_push!((down_l, down_c - 1), 1);
+                check_and_push!((down_l, down_c + 1), 1);
             }
         }
 
@@ -411,7 +420,7 @@ impl DaySolution for Day16 {
         //     println!();
         // }
 
-        println!("{}", path_nodes.len()+1);
+        println!("{}", path_nodes.len() + 1);
 
         results[end_l][end_c].cost.to_string()
     }
