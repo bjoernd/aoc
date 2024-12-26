@@ -426,7 +426,7 @@ impl DaySolution for Day16 {
     }
 
     fn part_two(&self) -> String {
-        let mut sum = 0_usize;
+        let sum = 0_usize;
         sum.to_string()
     }
 }
