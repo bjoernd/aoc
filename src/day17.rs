@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
+use crate::{DaySolution, FromInput};
 use itertools::Itertools;
 use num::FromPrimitive;
-use crate::{DaySolution, FromInput};
 extern crate num;
 
 #[derive(Clone, Copy, Debug)]
@@ -11,7 +13,7 @@ struct CPUState {
     instruction_index: u64,
 }
 
-#[derive(FromPrimitive,Debug)]
+#[derive(FromPrimitive, Debug)]
 enum Opcodes {
     ADV = 0,
     BXL = 1,
@@ -20,12 +22,16 @@ enum Opcodes {
     BXC = 4,
     OUT = 5,
     BDV = 6,
-    CDV = 7
+    CDV = 7,
 }
 
 impl CPUState {
+    #[allow(dead_code)]
     fn print(&self) {
-        println!("[{:4x}] A {:8} B {:8} C {:8}", self.instruction_index, self.reg_a, self.reg_b, self.reg_c);
+        println!(
+            "[{:4x}] A {:8} B {:8} C {:8}",
+            self.instruction_index, self.reg_a, self.reg_b, self.reg_c
+        );
     }
 }
 
@@ -37,15 +43,18 @@ pub struct Day17 {
 }
 
 impl Day17 {
-
     fn combo_to_value(&self, combo: u8) -> i64 {
         match combo {
             0..=3 => combo as i64,
             4 => self.cpu_state.reg_a as i64,
             5 => self.cpu_state.reg_b as i64,
             6 => self.cpu_state.reg_c as i64,
-            7 => { panic!("Reserved combo value"); },
-            _ => { panic!("Way too high combo value"); },
+            7 => {
+                panic!("Reserved combo value");
+            }
+            _ => {
+                panic!("Way too high combo value");
+            }
         }
     }
 
@@ -62,42 +71,42 @@ impl Day17 {
                 // let denom = 1 << combo;
                 self.cpu_state.reg_a = numerator >> combo;
                 self.cpu_state.instruction_index += 2;
-            },
+            }
             Opcodes::BXL => {
                 let op1 = self.cpu_state.reg_b;
                 self.cpu_state.reg_b = op1 ^ operand as i64;
                 self.cpu_state.instruction_index += 2;
-            },
+            }
             Opcodes::BST => {
                 let val = self.combo_to_value(operand);
                 // println!("  BST op {:x} -> {:x}", val, val & 7);
                 self.cpu_state.reg_b = val & 7;
                 // println!("  BST res {:x}", self.cpu_state.reg_b);
                 self.cpu_state.instruction_index += 2;
-            },
+            }
             Opcodes::JNZ => {
                 if self.cpu_state.reg_a != 0 {
                     self.cpu_state.instruction_index = operand as u64;
                 } else {
                     self.cpu_state.instruction_index += 2;
                 }
-            },
+            }
             Opcodes::BXC => {
                 self.cpu_state.reg_b = self.cpu_state.reg_b ^ self.cpu_state.reg_c;
                 self.cpu_state.instruction_index += 2;
-            },
+            }
             Opcodes::OUT => {
                 let val = self.combo_to_value(operand) & 0x7;
                 self.output.push(val as u8);
                 self.cpu_state.instruction_index += 2;
-            },
+            }
             Opcodes::BDV => {
                 let combo = self.combo_to_value(operand);
                 let numerator = self.cpu_state.reg_a;
                 // let denom = 1 << combo;
                 self.cpu_state.reg_b = numerator >> combo;
                 self.cpu_state.instruction_index += 2;
-            },
+            }
             Opcodes::CDV => {
                 let combo = self.combo_to_value(operand);
                 let numerator = self.cpu_state.reg_a;
@@ -113,14 +122,13 @@ impl Day17 {
             self.execute_one();
         }
     }
-
 }
 
 impl FromInput for Day17 {
     fn from_lines(_lines: impl Iterator<Item = String>) -> Self {
-        let mut regA = 0i64;
-        let mut regB = 0i64;
-        let mut regC = 0i64;
+        let mut reg_a = 0i64;
+        let mut reg_b = 0i64;
+        let mut reg_c = 0i64;
         let mut prog = vec![];
 
         for l in _lines {
@@ -133,13 +141,13 @@ impl FromInput for Day17 {
 
             match determinator {
                 "A:" => {
-                    regA = i64::from_str_radix(split_l[2], 10).unwrap();
+                    reg_a = i64::from_str_radix(split_l[2], 10).unwrap();
                 }
                 "B:" => {
-                    regB = i64::from_str_radix(split_l[2], 10).unwrap();
+                    reg_b = i64::from_str_radix(split_l[2], 10).unwrap();
                 }
                 "C:" => {
-                    regC = i64::from_str_radix(split_l[2], 10).unwrap();
+                    reg_c = i64::from_str_radix(split_l[2], 10).unwrap();
                 }
                 _ => {
                     prog = split_l[1]
@@ -150,8 +158,69 @@ impl FromInput for Day17 {
             }
         }
 
-        Day17{ cpu_state: CPUState{ reg_a: regA, reg_b: regB, reg_c: regC, instruction_index: 0}, program: prog, output: vec![]}
+        Day17 {
+            cpu_state: CPUState {
+                reg_a,
+                reg_b,
+                reg_c,
+                instruction_index: 0,
+            },
+            program: prog,
+            output: vec![],
+        }
     }
+}
+
+fn compute(octets: &Vec<u8>, depth: usize) -> bool {
+    let mut input = 0i64;
+    for o in octets {
+        input <<= 3;
+        input |= *o as i64;
+    }
+
+    let mut computer = Day17 {
+        cpu_state: CPUState {
+            reg_a: input,
+            reg_b: 0,
+            reg_c: 0,
+            instruction_index: 0,
+        },
+        program: vec![2, 4, 1, 1, 7, 5, 4, 0, 0, 3, 1, 6, 5, 5, 3, 0],
+        output: vec![],
+    };
+
+    computer.execute();
+
+    // println!("{} {}", computer.program.len(), depth);
+
+    if computer.program.len() >= depth {
+        if depth == computer.program.len() && computer.output[computer.output.len() - depth..]
+        == computer.program[computer.program.len() - depth..] {
+            println!("SUCCESS! {}", input);
+            return true;
+        }
+
+        computer.output[computer.output.len() - depth..]
+            == computer.program[computer.program.len() - depth..]
+    } else {
+        false
+    }
+}
+
+fn try_level(octets_so_far: Vec<u8>) -> bool {
+    for i in 0u8..8 {
+        let mut new_v = octets_so_far.clone();
+        new_v.push(i);
+        let l = new_v.len();
+        if compute(&new_v, l) {
+            if try_level(new_v.clone()) {
+                println!("Found {:?} @ {}", new_v, l);
+                return true;
+            }
+        }
+    }
+
+    false
 }
 
 impl DaySolution for Day17 {
@@ -163,34 +232,26 @@ impl DaySolution for Day17 {
     }
 
     fn part_two(&self) -> String {
-        let mut try_a = 0;
+        /*  PROG: 2,4,1,1,7,5,4,0,0,3,1,6,5,5,3,0
+           OUT:  2,4,1,1,7,5,4,0,0,3,1,6,5,5,3,0
 
-        loop {
-            let mut computer = self.clone();
-            computer.cpu_state.reg_a = try_a;
+           regB = regA & 0x7
+           regB = regB XOR 1
 
-            if try_a & 0xFFFFFF == 0 {
-                println!("{}", try_a);
-            }
+           regC = regA >> *regB
 
-            computer.execute();
+           regB = regB XOR regC
+           regB = regB XOR 6
 
-            if computer.program.len() == computer.output.len() {
-                println!("??? {:?} {:?}", computer.program, computer.output);
-                let mut matched = true;
+           OUT regB & 0x7
 
-                for i in 0..computer.program.len() {
-                    if computer.program[i] != computer.output[i] {
-                        matched = false;
-                    }
-                }
+           regA = regA >> 3
+           JNZ 0
 
-                if matched { break; }
-            }
+        */
 
-            try_a += 1;
-        }
+        try_level(vec![]);
 
-        try_a.to_string()
+        String::from_str("NA").unwrap()
     }
 }
