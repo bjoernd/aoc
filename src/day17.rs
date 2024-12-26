@@ -194,8 +194,10 @@ fn compute(octets: &Vec<u8>, depth: usize) -> bool {
     // println!("{} {}", computer.program.len(), depth);
 
     if computer.program.len() >= depth {
-        if depth == computer.program.len() && computer.output[computer.output.len() - depth..]
-        == computer.program[computer.program.len() - depth..] {
+        if depth == computer.program.len()
+            && computer.output[computer.output.len() - depth..]
+                == computer.program[computer.program.len() - depth..]
+        {
             println!("SUCCESS! {}", input);
             return true;
         }
