@@ -5,7 +5,7 @@ use memoize::memoize;
 
 pub struct Day19 {
     patterns: Vec<String>,
-    targets: Vec<String>
+    targets: Vec<String>,
 }
 
 impl FromInput for Day19 {
@@ -27,13 +27,12 @@ impl FromInput for Day19 {
             }
         }
 
-        Day19{ patterns, targets }
+        Day19 { patterns, targets }
     }
 }
 
 #[memoize]
 fn can_build(target: String, patterns: Vec<String>) -> usize {
-
     let mut rem = target.clone();
 
     // println!("can_build({})", rem);
@@ -57,8 +56,7 @@ fn can_build(target: String, patterns: Vec<String>) -> usize {
         }
 
         count
-    }
-    else {
+    } else {
         1
     }
 }
