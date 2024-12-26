@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use crate::{DaySolution, FromInput};
 use memoize::memoize;
 
