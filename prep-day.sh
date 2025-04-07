@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 # Downloads the input and sets up module boilerplate for
 # the given day. Expects that a `.session` file exists with the
 # user's session key from the Advent of Code website. See the
@@ -14,6 +12,12 @@ set -e
 # ./prep-day.sh <day> [year]
 # Example: ./prep-day.sh 10     # Uses current year or December's year
 # Example: ./prep-day.sh 10 2023 # Explicitly use year 2023
+
+# Error handling function
+handle_error() {
+  echo "ERROR: $1" >&2
+  exit 1
+}
 
 # Determine the year to use
 if [ -n "$2" ]; then
@@ -36,31 +40,70 @@ fi
 
 echo "Using year: $YEAR"
 
-mkdir -p .input
-mkdir -p "$YEAR"
+# Create necessary directories
+mkdir -p .input || handle_error "Failed to create .input directory. Check permissions."
+mkdir -p "$YEAR" || handle_error "Failed to create $YEAR directory. Check permissions."
 
+# Validate day parameter
 if test -z "$1"; then
-  echo "Must provide day of month (not zero-padded) as first argument"
-  exit 1
+  handle_error "Must provide day of month (not zero-padded) as first argument"
 fi
 
 if [[ 1 -gt "$1" || 25 -lt "$1" ]]; then
-  echo "Day must be between 1 and 25, inclusive"
-  exit 1
+  handle_error "Day must be between 1 and 25, inclusive"
 fi
 
+# Check for session file
+if [ ! -f .session ]; then
+  handle_error "Session file (.session) not found. Please create this file with your AoC session token.
+See README.md for instructions on how to obtain your session token."
+fi
+
+# Read session token
 SESSION=$(cat .session)
 if test -z "$SESSION"; then
-  echo "Must set the session from the Advent of Code site"
-  exit 1
+  handle_error "Session token is empty. Please add your AoC session token to the .session file.
+See README.md for instructions on how to obtain your session token."
 fi
 
+# Download input data if needed
 if test -e ".input/$1.txt"; then
   echo "Data already exists for day $1, skipping download..."
 else
   echo "Downloading data for day $1 to .input/$1.txt..."
-  curl "https://adventofcode.com/$YEAR/day/$1/input" \
-    --silent --max-time 10 --cookie "session=$SESSION" > ".input/$1.txt"
+  
+  # Create a temporary file for the response
+  TEMP_FILE=$(mktemp)
+  
+  # Download with error handling
+  HTTP_STATUS=$(curl "https://adventofcode.com/$YEAR/day/$1/input" \
+    --silent --max-time 30 \
+    --cookie "session=$SESSION" \
+    --write-out "%{http_code}" \
+    --output "$TEMP_FILE")
+  
+  # Check HTTP status code
+  if [ "$HTTP_STATUS" -eq 200 ]; then
+    # Check if the response contains an error message about invalid session
+    if grep -q "Please log in" "$TEMP_FILE"; then
+      rm "$TEMP_FILE"
+      handle_error "Session token is invalid or expired. Please update your session token in the .session file.
+See README.md for instructions on how to obtain a fresh session token."
+    fi
+    
+    # Success - move the temp file to the final location
+    mv "$TEMP_FILE" ".input/$1.txt"
+    echo "Download successful!"
+  elif [ "$HTTP_STATUS" -eq 404 ]; then
+    rm "$TEMP_FILE"
+    handle_error "Puzzle not available yet. Puzzles unlock at midnight Eastern Time (UTC-5)."
+  elif [ "$HTTP_STATUS" -eq 500 ]; then
+    rm "$TEMP_FILE"
+    handle_error "Server error. The Advent of Code server might be overloaded. Please try again later."
+  else
+    rm "$TEMP_FILE"
+    handle_error "Failed to download input (HTTP status $HTTP_STATUS). Check your internet connection and try again."
+  fi
 fi
 
 if test -e "src/day$1.rs"; then
@@ -96,20 +139,31 @@ impl DaySolution for Day$1 {
 }
 EOF
 
-SED="sed"
-if [ "$(uname -s)" = "Darwin" ]
-then
-  SED=gsed
-fi
+  # Check if the file was created successfully
+  if [ ! -f "src/day$1.rs" ]; then
+    handle_error "Failed to create src/day$1.rs. Check permissions and disk space."
+  fi
 
-"$SED" -i "s|// MOD_MARKER|mod day$1;\nuse day$1::Day$1;\n// MOD_MARKER|" src/main.rs
-"$SED" -i "s|        // DAY_MARKER|        $1 => Box::new(Day$1::from_lines(lines)),\n        // DAY_MARKER|" src/main.rs
+  # Determine which sed to use
+  SED="sed"
+  if [ "$(uname -s)" = "Darwin" ]; then
+    if command -v gsed >/dev/null 2>&1; then
+      SED=gsed
+    else
+      handle_error "GNU sed (gsed) is required on macOS but not found. Please install it with 'brew install gnu-sed'."
+    fi
+  fi
 
-echo "Updated main.rs:"
+  # Update main.rs
+  if [ ! -f "src/main.rs" ]; then
+    handle_error "src/main.rs not found. Make sure you're running this script from the repository root."
+  fi
+
+  "$SED" -i "s|// MOD_MARKER|mod day$1;\nuse day$1::Day$1;\n// MOD_MARKER|" src/main.rs || handle_error "Failed to update main.rs with module declaration."
+  "$SED" -i "s|        // DAY_MARKER|        $1 => Box::new(Day$1::from_lines(lines)),\n        // DAY_MARKER|" src/main.rs || handle_error "Failed to update main.rs with day solution."
+
+  echo "Updated main.rs:"
   git diff src/main.rs
-  #echo "  mod day$1;"
-  #echo "  use day$1::Day$1;"
-  #echo "  $1 => Box::new(Day$1::from_lines(lines)),"
 fi
 
 echo "Happy coding!"
