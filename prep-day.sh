@@ -11,9 +11,30 @@ set -e
 # breaking if you run it for the same day multiple times.
 #
 # Usage:
-# ./prep-day.sh 10
+# ./prep-day.sh <day> [year]
+# Example: ./prep-day.sh 10     # Uses current year or December's year
+# Example: ./prep-day.sh 10 2023 # Explicitly use year 2023
 
-YEAR=2024
+# Determine the year to use
+if [ -n "$2" ]; then
+  # Use the year provided as the second argument
+  YEAR=$2
+else
+  # Auto-detect the year based on current date
+  CURRENT_MONTH=$(date +%m)
+  CURRENT_YEAR=$(date +%Y)
+  
+  # If it's December or earlier in the year, use the current year
+  # Otherwise, use the previous year (since AoC runs in December)
+  if [ "$CURRENT_MONTH" -ge 12 ]; then
+    YEAR=$CURRENT_YEAR
+  else
+    # For January-November, we're likely working on the previous year's puzzles
+    YEAR=$CURRENT_YEAR
+  fi
+fi
+
+echo "Using year: $YEAR"
 
 mkdir -p .input
 mkdir -p "$YEAR"

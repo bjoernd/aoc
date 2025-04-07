@@ -62,7 +62,11 @@ boilerplate module to `src/dayN.rs`, so you can start working (almost)
 right away! Here's how to run it:
 
 ```bash
+# Use with current year (auto-detected)
 sh prep-day.sh <day>
+
+# Or specify a particular year
+sh prep-day.sh <day> <year>
 ```
 
 The script will also update `main.rs` with the boilerplate needed to
